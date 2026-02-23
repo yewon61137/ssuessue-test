@@ -1,17 +1,38 @@
-// Teachable Machine URL - 수정 필요!
+// [필독] Teachable Machine 모델 URL 설정
+// 여기에 본인의 모델 주소를 넣으세요. 끝에 '/'가 반드시 있어야 합니다.
+// 예: "https://teachablemachine.withgoogle.com/models/ABCD12345/"
 const URL = "https://teachablemachine.withgoogle.com/models/mnjbopnr/";
 
 let model, labelContainer, maxPredictions;
 
+// 화면 전환 기능
+function showSection(sectionId) {
+    document.querySelectorAll('.content-section').forEach(sec => {
+        sec.style.display = 'none';
+    });
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    document.getElementById(sectionId + '-section').style.display = 'block';
+    event.currentTarget.classList.add('active');
+}
+
 async function init() {
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
-    model = await tmImage.load(modelURL, metadataURL);
-    maxPredictions = model.getTotalClasses();
-    labelContainer = document.getElementById("label-container");
+    try {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+        labelContainer = document.getElementById("label-container");
+    } catch (e) {
+        console.error("모델 로드 실패. URL을 확인하세요.", e);
+        alert("모델을 불러오지 못했습니다. URL 설정을 확인해 주세요.");
+    }
 }
 
 async function predict() {
+    if (!model) return;
     const image = document.getElementById("face-image");
     const prediction = await model.predict(image);
     
@@ -52,24 +73,9 @@ function readURL(input) {
     }
 }
 
-// Theme handling
-const currentTheme = localStorage.getItem('theme');
-if (currentTheme === 'dark') {
-    document.body.classList.add('dark-mode');
-    themeToggle.textContent = '☀️';
-}
-
-themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    let theme = 'light';
-    if (document.body.classList.contains('dark-mode')) {
-        theme = 'dark';
-        themeToggle.textContent = '☀️';
-    } else {
-        themeToggle.textContent = '🌙';
-    }
-    localStorage.setItem('theme', theme);
-});
+// 로또 기능
+const generateBtn = document.getElementById('generate-btn');
+const gamesContainer = document.getElementById('games-container');
 
 function generateLottoGame() {
     const numbers = new Set();
@@ -108,20 +114,14 @@ function displayGames() {
 }
 
 function getNumberColor(number) {
-    if (number <= 10) {
-        return '#f44336'; // Red
-    } else if (number <= 20) {
-        return '#ff9800'; // Orange
-    } else if (number <= 30) {
-        return '#ffc107'; // Amber
-    } else if (number <= 40) {
-        return '#4caf50'; // Green
-    } else {
-        return '#2196f3'; // Blue
-    }
+    if (number <= 10) return '#f44336';
+    if (number <= 20) return '#ff9800';
+    if (number <= 30) return '#ffc107';
+    if (number <= 40) return '#4caf50';
+    return '#2196f3';
 }
 
 generateBtn.addEventListener('click', displayGames);
 
-// Initial generation
+// 초기 로드
 displayGames();

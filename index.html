@@ -3,34 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotto & Animal Face Test</title>
+    <title>Animal Test & Lotto</title>
     <link rel="stylesheet" href="style.css">
     <!-- Teachable Machine Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 </head>
 <body>
-    <button id="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
     <div class="container">
-        <h1>Lotto & Animal Test</h1>
+        <h1>Fun Tools</h1>
         
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="showSection('animal')">Animal Face Test</button>
+            <button class="nav-btn" onclick="showSection('lotto')">Lotto Generator</button>
+        </div>
+
         <!-- Animal Face Test Section -->
-        <div class="test-section">
+        <div id="animal-section" class="content-section">
             <h2>Animal Face Test</h2>
             <p>Upload a photo to see if you look like a Dog or a Cat!</p>
             <div id="upload-area">
                 <input type="file" id="image-input" accept="image/*" onchange="readURL(this);" style="display: none;">
                 <label for="image-input" class="upload-label">Click to Upload Image</label>
-                <img id="face-image" src="#" alt="your image" style="display: none; max-width: 100%; margin-top: 20px; border-radius: 10px;">
+                <img id="face-image" src="#" alt="your image" style="display: none; max-width: 100%; margin: 20px auto; border-radius: 10px;">
             </div>
             <div id="loading" style="display: none; margin-top: 10px;">Analyzing...</div>
             <div id="label-container" style="margin-top: 20px;"></div>
         </div>
 
-        <hr style="margin: 3rem 0; border: 0; border-top: 1px solid var(--inner-shadow-color);">
-
         <!-- Lotto Section -->
-        <div class="lotto-section">
+        <div id="lotto-section" class="content-section" style="display: none;">
             <h2>Lotto Number Generator</h2>
             <div id="games-container"></div>
             <button id="generate-btn">Generate 5 Games</button>
@@ -51,7 +54,7 @@
         </div>
 
         <div id="comments-section" style="margin-top: 3rem;">
-            <hr style="border: 0; border-top: 1px solid var(--inner-shadow-color); margin-bottom: 2rem;">
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 2rem;">
             <div id="disqus_thread"></div>
             <script>
                 (function() {
