@@ -1,7 +1,5 @@
-// [필독] Teachable Machine 모델 URL 설정
-// 여기에 본인의 모델 주소를 넣으세요. 끝에 '/'가 반드시 있어야 합니다.
-// 예: "https://teachablemachine.withgoogle.com/models/ABCD12345/"
-const URL = "https://teachablemachine.withgoogle.com/models/mnjbopnr/";
+// Teachable Machine 모델 URL 설정
+const URL = "https://teachablemachine.withgoogle.com/models/BWG1q_SiO/";
 
 let model, labelContainer, maxPredictions;
 
