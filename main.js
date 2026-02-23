@@ -12,7 +12,10 @@ function showSection(sectionId) {
         btn.classList.remove('active');
     });
     
-    document.getElementById(sectionId + '-section').style.display = 'block';
+    const targetSection = document.getElementById(sectionId + '-section');
+    if (targetSection) {
+        targetSection.style.display = 'block';
+    }
     event.currentTarget.classList.add('active');
 }
 
@@ -36,7 +39,12 @@ async function predict() {
     
     labelContainer.innerHTML = "";
     for (let i = 0; i < maxPredictions; i++) {
-        const classPrediction = prediction[i].className;
+        let classPrediction = prediction[i].className;
+        
+        // 클래스명 한글 매핑 (강아지/고양이)
+        if (classPrediction.toLowerCase() === 'dog') classPrediction = '강아지상';
+        if (classPrediction.toLowerCase() === 'cat') classPrediction = '고양이상';
+
         const probability = (prediction[i].probability * 100).toFixed(0);
         
         const resultDiv = document.createElement("div");
@@ -91,7 +99,7 @@ function displayGames() {
         gameDiv.classList.add('lotto-game');
 
         const gameHeader = document.createElement('h2');
-        gameHeader.textContent = `Game ${i}`;
+        gameHeader.textContent = `게임 ${i}`;
         gameDiv.appendChild(gameHeader);
 
         const lottoNumbersContainer = document.createElement('div');

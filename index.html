@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Test & Lotto</title>
+    <title>동물상 테스트 & 로또 번호 생성기</title>
     <link rel="stylesheet" href="style.css">
     <!-- Teachable Machine Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
@@ -11,45 +11,45 @@
 </head>
 <body>
     <div class="container">
-        <h1>Fun Tools</h1>
+        <h1>재미있는 도구들</h1>
         
         <!-- Navigation Tabs -->
         <div class="nav-tabs">
-            <button class="nav-btn active" onclick="showSection('animal')">Animal Face Test</button>
-            <button class="nav-btn" onclick="showSection('lotto')">Lotto Generator</button>
+            <button class="nav-btn active" onclick="showSection('animal')">동물상 테스트</button>
+            <button class="nav-btn" onclick="showSection('lotto')">로또 번호 생성</button>
         </div>
 
         <!-- Animal Face Test Section -->
         <div id="animal-section" class="content-section">
-            <h2>Animal Face Test</h2>
-            <p>Upload a photo to see if you look like a Dog or a Cat!</p>
+            <h2>동물상 테스트</h2>
+            <p>사진을 업로드하여 강아지상인지 고양이상인지 확인해보세요!</p>
             <div id="upload-area">
                 <input type="file" id="image-input" accept="image/*" onchange="readURL(this);" style="display: none;">
-                <label for="image-input" class="upload-label">Click to Upload Image</label>
-                <img id="face-image" src="#" alt="your image" style="display: none; max-width: 100%; margin: 20px auto; border-radius: 10px;">
+                <label for="image-input" class="upload-label">이미지 업로드하기</label>
+                <img id="face-image" src="#" alt="사용자 이미지" style="display: none; max-width: 100%; margin: 20px auto; border-radius: 10px;">
             </div>
-            <div id="loading" style="display: none; margin-top: 10px;">Analyzing...</div>
+            <div id="loading" style="display: none; margin-top: 10px;">분석 중...</div>
             <div id="label-container" style="margin-top: 20px;"></div>
         </div>
 
         <!-- Lotto Section -->
         <div id="lotto-section" class="content-section" style="display: none;">
-            <h2>Lotto Number Generator</h2>
+            <h2>로또 번호 생성기</h2>
             <div id="games-container"></div>
-            <button id="generate-btn">Generate 5 Games</button>
+            <button id="generate-btn">5게임 생성하기</button>
         </div>
 
         <div class="contact-section">
             <hr>
-            <h3>Partnership Inquiry</h3>
+            <h3>제휴 문의</h3>
             <form action="https://formspree.io/f/mnjbopnr" method="POST" id="contact-form">
                 <div class="form-group">
-                    <input type="email" name="email" placeholder="Your Email" required>
+                    <input type="email" name="email" placeholder="이메일 주소" required>
                 </div>
                 <div class="form-group">
-                    <textarea name="message" placeholder="Your Message" required></textarea>
+                    <textarea name="message" placeholder="문의 내용" required></textarea>
                 </div>
-                <button type="submit" id="submit-btn">Send Inquiry</button>
+                <button type="submit" id="submit-btn">문의 보내기</button>
             </form>
         </div>
 
