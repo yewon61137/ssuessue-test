@@ -1,24 +1,67 @@
+:root {
+    --bg-color: #f0f0f0;
+    --container-bg: white;
+    --text-color: #333;
+    --game-bg: #f9f9f9;
+    --game-header-color: #555;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --inner-shadow-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode {
+    --bg-color: #121212;
+    --container-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --game-bg: #2d2d2d;
+    --game-header-color: #bbbbbb;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --inner-shadow-color: rgba(0, 0, 0, 0.3);
+}
+
 body {
     font-family: sans-serif;
-    background-color: #f0f0f0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .container {
-    background-color: white;
+    background-color: var(--container-bg);
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px var(--shadow-color);
     text-align: center;
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 h1 {
     margin-bottom: 2rem;
-    color: #333;
+    color: var(--text-color);
+}
+
+#theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--container-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    box-shadow: 0 0 5px var(--shadow-color);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 #games-container {
@@ -29,16 +72,17 @@ h1 {
 }
 
 .lotto-game {
-    background-color: #f9f9f9;
+    background-color: var(--game-bg);
     padding: 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 5px var(--inner-shadow-color);
+    transition: background-color 0.3s;
 }
 
 .lotto-game h2 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: #555;
+    color: var(--game-header-color);
     font-size: 1.2rem;
 }
 
