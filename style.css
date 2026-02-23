@@ -165,6 +165,57 @@ h1 {
     font-size: 1rem;
 }
 
-#submit-btn:hover {
+.test-section {
+    background-color: var(--game-bg);
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.upload-label {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background-color: #2196f3;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.upload-label:hover {
     background-color: #1976d2;
+}
+
+.result-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    background-color: var(--container-bg);
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.result-label {
+    width: 60px;
+    font-weight: bold;
+}
+
+.bar-container {
+    flex-grow: 1;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 10px;
+    margin: 0 10px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.5s ease-in-out;
+}
+
+.percent {
+    width: 40px;
+    font-size: 0.9rem;
 }

@@ -3,15 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotto Number Generator - 5 Games</title>
+    <title>Lotto & Animal Face Test</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Teachable Machine Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 </head>
 <body>
     <button id="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
     <div class="container">
-        <h1>Lotto Number Generator</h1>
-        <div id="games-container"></div>
-        <button id="generate-btn">Generate 5 Games</button>
+        <h1>Lotto & Animal Test</h1>
+        
+        <!-- Animal Face Test Section -->
+        <div class="test-section">
+            <h2>Animal Face Test</h2>
+            <p>Upload a photo to see if you look like a Dog or a Cat!</p>
+            <div id="upload-area">
+                <input type="file" id="image-input" accept="image/*" onchange="readURL(this);" style="display: none;">
+                <label for="image-input" class="upload-label">Click to Upload Image</label>
+                <img id="face-image" src="#" alt="your image" style="display: none; max-width: 100%; margin-top: 20px; border-radius: 10px;">
+            </div>
+            <div id="loading" style="display: none; margin-top: 10px;">Analyzing...</div>
+            <div id="label-container" style="margin-top: 20px;"></div>
+        </div>
+
+        <hr style="margin: 3rem 0; border: 0; border-top: 1px solid var(--inner-shadow-color);">
+
+        <!-- Lotto Section -->
+        <div class="lotto-section">
+            <h2>Lotto Number Generator</h2>
+            <div id="games-container"></div>
+            <button id="generate-btn">Generate 5 Games</button>
+        </div>
 
         <div class="contact-section">
             <hr>
@@ -31,23 +54,13 @@
             <hr style="border: 0; border-top: 1px solid var(--inner-shadow-color); margin-bottom: 2rem;">
             <div id="disqus_thread"></div>
             <script>
-                /**
-                *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-                *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
-                /*
-                var disqus_config = function () {
-                this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-                this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-                };
-                */
-                (function() { // DON'T EDIT BELOW THIS LINE
+                (function() {
                 var d = document, s = d.createElement('script');
                 s.src = 'https://ssuessue-test.disqus.com/embed.js';
                 s.setAttribute('data-timestamp', +new Date());
                 (d.head || d.body).appendChild(s);
                 })();
             </script>
-            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
         </div>
     </div>
     <script src="main.js"></script>

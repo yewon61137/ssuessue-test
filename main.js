@@ -1,6 +1,56 @@
-const generateBtn = document.getElementById('generate-btn');
-const gamesContainer = document.getElementById('games-container');
-const themeToggle = document.getElementById('theme-toggle');
+// Teachable Machine URL - 수정 필요!
+const URL = "https://teachablemachine.withgoogle.com/models/mnjbopnr/";
+
+let model, labelContainer, maxPredictions;
+
+async function init() {
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
+    model = await tmImage.load(modelURL, metadataURL);
+    maxPredictions = model.getTotalClasses();
+    labelContainer = document.getElementById("label-container");
+}
+
+async function predict() {
+    const image = document.getElementById("face-image");
+    const prediction = await model.predict(image);
+    
+    labelContainer.innerHTML = "";
+    for (let i = 0; i < maxPredictions; i++) {
+        const classPrediction = prediction[i].className;
+        const probability = (prediction[i].probability * 100).toFixed(0);
+        
+        const resultDiv = document.createElement("div");
+        resultDiv.className = "result-bar";
+        resultDiv.innerHTML = `
+            <span class="result-label">${classPrediction}</span>
+            <div class="bar-container">
+                <div class="bar" style="width: ${probability}%"></div>
+            </div>
+            <span class="percent">${probability}%</span>
+        `;
+        labelContainer.appendChild(resultDiv);
+    }
+    document.getElementById("loading").style.display = "none";
+}
+
+function readURL(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById("face-image");
+            img.src = e.target.result;
+            img.style.display = "block";
+            document.getElementById("loading").style.display = "block";
+            if (!model) {
+                init().then(() => predict());
+            } else {
+                predict();
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 
 // Theme handling
 const currentTheme = localStorage.getItem('theme');
