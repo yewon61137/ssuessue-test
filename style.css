@@ -94,6 +94,7 @@ h1 {
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     margin-bottom: 3rem;
     text-align: center;
+    scroll-margin-top: 80px; /* 스티키 헤더 높이만큼 여백 추가 */
 }
 
 .section-title {
@@ -138,6 +139,7 @@ h1 {
 /* Informative Content Styles */
 .info-content {
     margin-bottom: 5rem;
+    scroll-margin-top: 100px; /* 정보 섹션들도 여백 추가 */
 }
 
 .guide-grid {
