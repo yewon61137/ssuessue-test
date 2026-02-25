@@ -17,10 +17,9 @@ export async function onRequestPost(context) {
             }), { status: 500 });
         }
 
-        // 구글 Gemini API 주소 (라이브러리 없이 직접 호출)
-        const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // 구글 Gemini API 주소 수정: v1 버전 사용 및 모델명 명확화
+        const apiURL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-        // 요청 데이터 구성
         const payload = {
             contents: [{
                 parts: [
@@ -33,7 +32,6 @@ export async function onRequestPost(context) {
             }
         };
 
-        // 직접 fetch 호출
         const response = await fetch(apiURL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -44,7 +42,7 @@ export async function onRequestPost(context) {
 
         if (!response.ok) {
             return new Response(JSON.stringify({ 
-                error: 'Gemini API 서버 오류', 
+                error: 'Gemini API 호출 실패', 
                 debug: JSON.stringify(result) 
             }), { status: response.status });
         }
@@ -58,8 +56,7 @@ export async function onRequestPost(context) {
     } catch (error) {
         return new Response(JSON.stringify({ 
             error: "서버 내부 오류", 
-            debug: error.message,
-            stack: error.stack
+            debug: error.message
         }), { 
             status: 500,
             headers: { 'Content-Type': 'application/json' }
