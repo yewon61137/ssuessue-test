@@ -185,15 +185,20 @@ h1 {
 
 footer {
     text-align: center;
-    color: #70757a;
-    font-size: 0.85rem;
-    margin-top: 3rem;
+    color: #9aa0a6;
+    font-size: 0.75rem;
+    margin-top: 4rem;
+    padding-bottom: 2rem;
+}
+
+.footer-links {
+    margin-bottom: 0.5rem;
 }
 
 .footer-links a {
-    color: #70757a;
+    color: #9aa0a6;
     text-decoration: none;
-    margin: 0 8px;
+    margin: 0 5px;
 }
 
 .footer-links a:hover {
@@ -201,7 +206,7 @@ footer {
 }
 
 .copyright {
-    margin-top: 1rem;
+    opacity: 0.8;
 }
 
 @media (max-width: 600px) {
