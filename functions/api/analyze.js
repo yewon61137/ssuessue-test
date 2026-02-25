@@ -1,6 +1,6 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-export async function onRequestPost(context) {
+async function onRequestPost(context) {
     try {
         const { request, env } = context;
         const { image } = await request.json();
@@ -31,7 +31,7 @@ export async function onRequestPost(context) {
         const result = await model.generateContent([prompt, imagePart]);
         const responseText = result.response.text();
 
-        // JSON 추출 및 정제
+        // JSON 추출 및 정제 (Gemini가 마크다운 형식을 포함할 수 있으므로)
         const cleanedJson = responseText.replace(/```json|```/g, "").trim();
         
         return new Response(cleanedJson, {
@@ -46,3 +46,5 @@ export async function onRequestPost(context) {
         });
     }
 }
+
+module.exports = { onRequestPost };
