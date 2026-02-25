@@ -66,35 +66,37 @@ body {
 
 .container {
     max-width: 900px;
-    margin: 2rem auto;
+    margin: 5rem auto; /* 상단 여백 2rem -> 5rem으로 증가 */
     padding: 0 1rem;
 }
 
 .main-header {
     text-align: center;
-    margin-bottom: 4rem;
+    margin-bottom: 5rem; /* 제목 섹션 하단 여백 증가 */
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: 2.8rem; /* 폰트 크기 약간 키움 */
     color: var(--text-main);
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem; /* 하단 간격 증가 */
+    letter-spacing: -1px;
 }
 
 .subtitle {
     color: var(--text-sub);
-    font-size: 1.2rem;
+    font-size: 1.25rem;
+    font-weight: 300;
 }
 
 /* Common Layout */
 .card {
     background: var(--bg-card);
-    padding: 3rem 2rem;
+    padding: 4rem 2rem; /* 내부 패딩 상하 증가 */
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    margin-bottom: 3rem;
+    margin-bottom: 4rem;
     text-align: center;
-    scroll-margin-top: 80px; /* 스티키 헤더 높이만큼 여백 추가 */
+    scroll-margin-top: 80px;
 }
 
 .section-title {
@@ -120,7 +122,7 @@ h1 {
 /* Test Section Styles */
 .upload-label {
     display: inline-block;
-    padding: 1.2rem 3rem;
+    padding: 1.3rem 3.5rem;
     background-color: var(--primary-color);
     color: white;
     border-radius: 50px;
@@ -129,11 +131,13 @@ h1 {
     font-size: 1.2rem;
     transition: all 0.3s;
     box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
+    margin-top: 1rem; /* 위쪽 텍스트와의 여백 확보 */
 }
 
 .upload-label:hover {
     background-color: var(--primary-hover);
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
 }
 
 /* Informative Content Styles */
