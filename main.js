@@ -1,6 +1,3 @@
-// ⚠️ 주의: API 키가 코드에 노출되어 있습니다.
-const API_KEY = "AIzaSyATVy8vhJ2uPxs8IMs-agkHpsndPAocNuI";
-
 async function predict() {
     const imageInput = document.getElementById("image-input");
     const labelContainer = document.getElementById("label-container");
@@ -16,36 +13,18 @@ async function predict() {
         const optimizedImage = await resizeImage(file, 800);
         const base64Image = optimizedImage.split(',')[1];
 
-        // 구글 Gemini API 직접 호출 (v1beta 버전이 이미지 분석에 가장 안정적임)
-        const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-
-        const payload = {
-            contents: [{
-                parts: [
-                    { text: "당신은 얼굴 분석 전문가입니다. 사진을 보고 강아지, 고양이, 토끼, 여우, 곰, 공룡상 중 하나를 골라 반드시 JSON으로만 답변하세요. 마크다운 기호 없이 순수 JSON만 출력하세요. 형식: { \"animal\": \"동물명\", \"description\": \"전체적인 분위기 설명\", \"details\": [\"눈매 분석\", \"코/입 분석\", \"전체적 인상 분석\"] }" },
-                    { inline_data: { mime_type: "image/jpeg", data: base64Image } }
-                ]
-            }],
-            generationConfig: {
-                response_mime_type: "application/json"
-            }
-        };
-
-        const response = await fetch(apiURL, {
+        // 다시 우리 서버 API로 요청 (보안 방식)
+        const response = await fetch('/api/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ image: base64Image })
         });
 
-        const result = await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(JSON.stringify(result));
+            throw new Error(`[${response.status}] ${data.error || '분석 실패'}\n디버그: ${data.debug || '내용 없음'}`);
         }
-
-        // 결과 파싱
-        const responseText = result.candidates[0].content.parts[0].text;
-        const data = JSON.parse(responseText);
 
         displayResult(data);
     } catch (error) {
@@ -54,7 +33,7 @@ async function predict() {
             <div style="color:#d93025; background:#fce8e6; padding:1.5rem; border-radius:10px; text-align:left;">
                 <p><strong>⚠️ 분석 실패</strong></p>
                 <pre style="font-size:0.8rem; white-space:pre-wrap; background:#fff; padding:10px; border-radius:5px; margin-top:10px;">${error.message}</pre>
-                <p style="font-size:0.8rem; margin-top:10px;">만약 403 에러가 뜬다면 구글에서 API 키를 정지시킨 것입니다.</p>
+                <p style="font-size:0.8rem; margin-top:10px;">Cloudflare 설정에서 새로운 API 키가 GEMINI_API_KEY로 정확히 등록되었는지 확인해 주세요.</p>
             </div>
         `;
     } finally {
