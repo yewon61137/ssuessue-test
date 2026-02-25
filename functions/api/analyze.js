@@ -7,18 +7,16 @@ export async function onRequestPost(context) {
         const apiKey = env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return new Response(JSON.stringify({ error: 'API 키 누락' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify({ error: 'API_KEY_MISSING' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
         }
 
-        // 모델 명칭 수정: gemini-1.5-flash-latest (가장 확실한 명칭)
         const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
-        const promptText = "당신은 얼굴 분석 전문가입니다. 사진을 보고 강아지, 고양이, 토끼, 여우, 곰, 공룡상 중 하나를 골라 반드시 JSON으로만 답변하세요. 결과에는 animal, description, details 필드가 포함되어야 합니다.";
-
+        // 텍스트를 아주 단순하게 구성 (빌드 에러 방지)
         const payload = {
             contents: [{
                 parts: [
-                    { text: promptText },
+                    { text: "Analyze this face. Return ONLY JSON with fields: animal, description, details." },
                     { inline_data: { mime_type: "image/jpeg", data: image } }
                 ]
             }],
@@ -36,18 +34,14 @@ export async function onRequestPost(context) {
         const result = await response.json();
 
         if (!response.ok) {
-            return new Response(JSON.stringify({ 
-                error: '구글 AI 응답 에러', 
-                debug: JSON.stringify(result) 
-            }), { status: response.status, headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify({ error: 'GEMINI_ERROR', debug: result }), { status: response.status, headers: { 'Content-Type': 'application/json' } });
         }
 
-        const responseText = result.candidates[0].content.parts[0].text;
-        return new Response(responseText, {
+        return new Response(result.candidates[0].content.parts[0].text, {
             headers: { 'Content-Type': 'application/json' }
         });
 
     } catch (error) {
-        return new Response(JSON.stringify({ error: "처리 중 예외 발생", debug: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify({ error: 'SERVER_ERROR', debug: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 }
