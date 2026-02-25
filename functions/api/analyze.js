@@ -7,22 +7,19 @@ export async function onRequestPost(context) {
         const apiKey = env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return new Response(JSON.stringify({ error: 'API_KEY_MISSING' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify({ error: 'KEY_MISSING' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
         }
 
-        const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+        // 최종 해결 주소: v1 버전 + gemini-1.5-flash 모델
+        const apiURL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-        // 텍스트를 아주 단순하게 구성 (빌드 에러 방지)
         const payload = {
             contents: [{
                 parts: [
-                    { text: "Analyze this face. Return ONLY JSON with fields: animal, description, details." },
+                    { text: "Analyze this image and identify which animal this person resembles most (Dog, Cat, Rabbit, Fox, Bear, or Dinosaur). Return ONLY a JSON object with fields: animal (translate to Korean like '강아지상'), description (detailed explanation in Korean), details (list of 3 specific traits in Korean)." },
                     { inline_data: { mime_type: "image/jpeg", data: image } }
                 ]
-            }],
-            generationConfig: {
-                response_mime_type: "application/json"
-            }
+            }]
         };
 
         const response = await fetch(apiURL, {
@@ -34,14 +31,15 @@ export async function onRequestPost(context) {
         const result = await response.json();
 
         if (!response.ok) {
-            return new Response(JSON.stringify({ error: 'GEMINI_ERROR', debug: result }), { status: response.status, headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify({ error: 'API_RESPONSE_ERROR', debug: result }), { status: response.status, headers: { 'Content-Type': 'application/json' } });
         }
 
-        return new Response(result.candidates[0].content.parts[0].text, {
+        const responseText = result.candidates[0].content.parts[0].text;
+        return new Response(responseText, {
             headers: { 'Content-Type': 'application/json' }
         });
 
     } catch (error) {
-        return new Response(JSON.stringify({ error: 'SERVER_ERROR', debug: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify({ error: 'FETCH_ERROR', debug: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 }
