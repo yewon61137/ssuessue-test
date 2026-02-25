@@ -12,10 +12,12 @@ export async function onRequestPost(context) {
         // Cloudflare 환경변수에서 키 가져오기
         const apiKey = env.GEMINI_API_KEY;
         if (!apiKey) {
-            return new Response(JSON.stringify({ error: 'API Key not configured' }), { status: 500 });
+            return new Response(JSON.stringify({ error: 'API Key not configured in Cloudflare' }), { status: 500 });
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
+        
+        // 모델 명칭 수정: gemini-1.5-flash (가장 범용적인 명칭 사용)
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `당신은 얼굴 관상과 이미지 분석 전문가입니다. 업로드된 사진을 분석하여 다음 단계에 따라 결과를 제공하세요.
@@ -32,11 +34,16 @@ export async function onRequestPost(context) {
             }
         };
 
+        // 분석 요청
         const result = await model.generateContent([prompt, imagePart]);
-        const responseText = result.response.text();
+        const response = await result.response;
+        const responseText = response.text();
 
-        // JSON 추출 및 정제
-        const cleanedJson = responseText.replace(/```json|```/g, "").trim();
+        // JSON 추출 및 정제 (가끔 마크다운 ```json 형식이 포함됨)
+        let cleanedJson = responseText;
+        if (responseText.includes("```")) {
+            cleanedJson = responseText.split("```")[1].replace("json", "").trim();
+        }
         
         return new Response(cleanedJson, {
             headers: { 'Content-Type': 'application/json' }
