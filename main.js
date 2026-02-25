@@ -1,3 +1,6 @@
+// ⚠️ 주의: API 키가 코드에 노출되어 있습니다.
+const API_KEY = "AIzaSyATVy8vhJ2uPxs8IMs-agkHpsndPAocNuI";
+
 async function predict() {
     const imageInput = document.getElementById("image-input");
     const labelContainer = document.getElementById("label-container");
@@ -13,27 +16,45 @@ async function predict() {
         const optimizedImage = await resizeImage(file, 800);
         const base64Image = optimizedImage.split(',')[1];
 
-        const response = await fetch('/api/analyze', {
+        // 구글 Gemini API 직접 호출 (v1beta 버전이 이미지 분석에 가장 안정적임)
+        const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+        const payload = {
+            contents: [{
+                parts: [
+                    { text: "당신은 얼굴 분석 전문가입니다. 사진을 보고 강아지, 고양이, 토끼, 여우, 곰, 공룡상 중 하나를 골라 반드시 JSON으로만 답변하세요. 마크다운 기호 없이 순수 JSON만 출력하세요. 형식: { \"animal\": \"동물명\", \"description\": \"전체적인 분위기 설명\", \"details\": [\"눈매 분석\", \"코/입 분석\", \"전체적 인상 분석\"] }" },
+                    { inline_data: { mime_type: "image/jpeg", data: base64Image } }
+                ]
+            }],
+            generationConfig: {
+                response_mime_type: "application/json"
+            }
+        };
+
+        const response = await fetch(apiURL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: base64Image })
+            body: JSON.stringify(payload)
         });
 
-        const data = await response.json();
+        const result = await response.json();
 
         if (!response.ok) {
-            // 서버에서 에러가 났을 때 구체적인 정보 출력
-            throw new Error(`[${response.status}] ${data.error || '알 수 없는 서버 오류'}\n상세: ${data.debug || '없음'}\n위치: ${data.stack || '없음'}`);
+            throw new Error(JSON.stringify(result));
         }
+
+        // 결과 파싱
+        const responseText = result.candidates[0].content.parts[0].text;
+        const data = JSON.parse(responseText);
 
         displayResult(data);
     } catch (error) {
         console.error("상세 에러:", error);
         labelContainer.innerHTML = `
             <div style="color:#d93025; background:#fce8e6; padding:1.5rem; border-radius:10px; text-align:left;">
-                <p><strong>⚠️ 분석 실패 (상세 보고서)</strong></p>
+                <p><strong>⚠️ 분석 실패</strong></p>
                 <pre style="font-size:0.8rem; white-space:pre-wrap; background:#fff; padding:10px; border-radius:5px; margin-top:10px;">${error.message}</pre>
-                <p style="font-size:0.8rem; margin-top:10px;">이 내용을 복사해서 알려주시면 바로 해결해 드릴 수 있습니다.</p>
+                <p style="font-size:0.8rem; margin-top:10px;">만약 403 에러가 뜬다면 구글에서 API 키를 정지시킨 것입니다.</p>
             </div>
         `;
     } finally {
