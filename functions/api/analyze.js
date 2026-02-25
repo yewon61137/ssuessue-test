@@ -7,12 +7,12 @@ export async function onRequestPost(context) {
         const apiKey = env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return new Response(JSON.stringify({ error: 'API 키 누락' }), { status: 500 });
+            return new Response(JSON.stringify({ error: 'API 키 누락' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
         }
 
-        const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // 모델 명칭 수정: gemini-1.5-flash-latest (가장 확실한 명칭)
+        const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
-        // 안전한 프롬프트 구성: JSON 내부에 따옴표를 쓰지 않고 명령을 내림
         const promptText = "당신은 얼굴 분석 전문가입니다. 사진을 보고 강아지, 고양이, 토끼, 여우, 곰, 공룡상 중 하나를 골라 반드시 JSON으로만 답변하세요. 결과에는 animal, description, details 필드가 포함되어야 합니다.";
 
         const payload = {
@@ -36,7 +36,10 @@ export async function onRequestPost(context) {
         const result = await response.json();
 
         if (!response.ok) {
-            return new Response(JSON.stringify({ error: 'API 호출 에러', debug: JSON.stringify(result) }), { status: response.status });
+            return new Response(JSON.stringify({ 
+                error: '구글 AI 응답 에러', 
+                debug: JSON.stringify(result) 
+            }), { status: response.status, headers: { 'Content-Type': 'application/json' } });
         }
 
         const responseText = result.candidates[0].content.parts[0].text;
@@ -45,6 +48,6 @@ export async function onRequestPost(context) {
         });
 
     } catch (error) {
-        return new Response(JSON.stringify({ error: "처리 오류", debug: error.message }), { status: 500 });
+        return new Response(JSON.stringify({ error: "처리 중 예외 발생", debug: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 }
