@@ -1,4 +1,9 @@
 {
+  "name": "ssuessue-test",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo 'No build step required'"
+  },
   "dependencies": {
     "@google/generative-ai": "^0.24.1"
   }

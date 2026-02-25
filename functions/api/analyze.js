@@ -1,6 +1,6 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-async function onRequestPost(context) {
+export async function onRequestPost(context) {
     try {
         const { request, env } = context;
         const { image } = await request.json();
@@ -11,6 +11,10 @@ async function onRequestPost(context) {
 
         // Cloudflare 환경변수에서 키 가져오기
         const apiKey = env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return new Response(JSON.stringify({ error: 'API Key not configured' }), { status: 500 });
+        }
+
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -31,7 +35,7 @@ async function onRequestPost(context) {
         const result = await model.generateContent([prompt, imagePart]);
         const responseText = result.response.text();
 
-        // JSON 추출 및 정제 (Gemini가 마크다운 형식을 포함할 수 있으므로)
+        // JSON 추출 및 정제
         const cleanedJson = responseText.replace(/```json|```/g, "").trim();
         
         return new Response(cleanedJson, {
@@ -40,11 +44,9 @@ async function onRequestPost(context) {
 
     } catch (error) {
         console.error("API Error:", error);
-        return new Response(JSON.stringify({ error: "Gemini 분석 중 오류 발생: " + error.message }), { 
+        return new Response(JSON.stringify({ error: "Gemini 분석 오류: " + error.message }), { 
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
     }
 }
-
-module.exports = { onRequestPost };
