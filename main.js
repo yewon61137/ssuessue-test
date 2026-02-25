@@ -3,22 +3,6 @@ const URL = "https://teachablemachine.withgoogle.com/models/BWG1q_SiO/";
 
 let model, labelContainer, maxPredictions;
 
-// 화면 전환 기능
-function showSection(sectionId) {
-    document.querySelectorAll('.content-section').forEach(sec => {
-        sec.style.display = 'none';
-    });
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    const targetSection = document.getElementById(sectionId + '-section');
-    if (targetSection) {
-        targetSection.style.display = 'block';
-    }
-    event.currentTarget.classList.add('active');
-}
-
 async function init() {
     try {
         const modelURL = URL + "model.json";
@@ -28,7 +12,7 @@ async function init() {
         labelContainer = document.getElementById("label-container");
     } catch (e) {
         console.error("모델 로드 실패. URL을 확인하세요.", e);
-        alert("모델을 불러오지 못했습니다. URL 설정을 확인해 주세요.");
+        alert("모델을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
     }
 }
 
@@ -38,17 +22,33 @@ async function predict() {
     const prediction = await model.predict(image);
     
     labelContainer.innerHTML = "";
+    
+    // 확률 순으로 정렬
+    prediction.sort((a, b) => b.probability - a.probability);
+
     for (let i = 0; i < maxPredictions; i++) {
         let classPrediction = prediction[i].className;
         
-        // 클래스명 한글 매핑 (강아지/고양이)
-        if (classPrediction.toLowerCase() === 'dog') classPrediction = '강아지상';
-        if (classPrediction.toLowerCase() === 'cat') classPrediction = '고양이상';
+        // 클래스명 한글 매핑
+        const mapping = {
+            'dog': '강아지상',
+            'cat': '고양이상',
+            'rabbit': '토끼상',
+            'fox': '여우상',
+            'bear': '곰상',
+            'dinosaur': '공룡상'
+        };
+        
+        classPrediction = mapping[classPrediction.toLowerCase()] || classPrediction;
 
         const probability = (prediction[i].probability * 100).toFixed(0);
         
         const resultDiv = document.createElement("div");
         resultDiv.className = "result-bar";
+        
+        // 상위 결과 강조
+        if (i === 0) resultDiv.classList.add('top-result');
+
         resultDiv.innerHTML = `
             <span class="result-label">${classPrediction}</span>
             <div class="bar-container">
@@ -69,6 +69,10 @@ function readURL(input) {
             img.src = e.target.result;
             img.style.display = "block";
             document.getElementById("loading").style.display = "block";
+            
+            // 결과 창 비우기
+            if (labelContainer) labelContainer.innerHTML = "";
+            
             if (!model) {
                 init().then(() => predict());
             } else {
@@ -78,56 +82,3 @@ function readURL(input) {
         reader.readAsDataURL(input.files[0]);
     }
 }
-
-// 로또 기능
-const generateBtn = document.getElementById('generate-btn');
-const gamesContainer = document.getElementById('games-container');
-
-function generateLottoGame() {
-    const numbers = new Set();
-    while (numbers.size < 6) {
-        const randomNumber = Math.floor(Math.random() * 45) + 1;
-        numbers.add(randomNumber);
-    }
-    return Array.from(numbers).sort((a, b) => a - b);
-}
-
-function displayGames() {
-    gamesContainer.innerHTML = '';
-    for (let i = 1; i <= 5; i++) {
-        const gameDiv = document.createElement('div');
-        gameDiv.classList.add('lotto-game');
-
-        const gameHeader = document.createElement('h2');
-        gameHeader.textContent = `게임 ${i}`;
-        gameDiv.appendChild(gameHeader);
-
-        const lottoNumbersContainer = document.createElement('div');
-        lottoNumbersContainer.classList.add('lotto-numbers');
-
-        const numbers = generateLottoGame();
-        numbers.forEach(number => {
-            const numberDiv = document.createElement('div');
-            numberDiv.classList.add('number');
-            numberDiv.textContent = number;
-            numberDiv.style.backgroundColor = getNumberColor(number);
-            lottoNumbersContainer.appendChild(numberDiv);
-        });
-
-        gameDiv.appendChild(lottoNumbersContainer);
-        gamesContainer.appendChild(gameDiv);
-    }
-}
-
-function getNumberColor(number) {
-    if (number <= 10) return '#f44336';
-    if (number <= 20) return '#ff9800';
-    if (number <= 30) return '#ffc107';
-    if (number <= 40) return '#4caf50';
-    return '#2196f3';
-}
-
-generateBtn.addEventListener('click', displayGames);
-
-// 초기 로드
-displayGames();
