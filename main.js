@@ -1,88 +1,64 @@
-async function predict() {
-    const imageInput = document.getElementById("image-input");
-    const labelContainer = document.getElementById("label-container");
-    const loading = document.getElementById("loading");
+// Teachable Machine 모델 URL 설정
+const URL = "https://teachablemachine.withgoogle.com/models/BWG1q_SiO/";
 
-    if (!imageInput.files[0]) return;
+let model, labelContainer, maxPredictions;
 
-    loading.style.display = "block";
-    labelContainer.innerHTML = "";
+// 화면 전환 기능
+function showSection(sectionId) {
+    document.querySelectorAll('.content-section').forEach(sec => {
+        sec.style.display = 'none';
+    });
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    const targetSection = document.getElementById(sectionId + '-section');
+    if (targetSection) {
+        targetSection.style.display = 'block';
+    }
+    event.currentTarget.classList.add('active');
+}
 
+async function init() {
     try {
-        const file = imageInput.files[0];
-        const optimizedImage = await resizeImage(file, 800);
-        const base64Image = optimizedImage.split(',')[1];
-
-        // 다시 우리 서버 API로 요청 (보안 방식)
-        const response = await fetch('/api/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: base64Image })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(`[${response.status}] ${data.error || '분석 실패'}\n디버그: ${data.debug || '내용 없음'}`);
-        }
-
-        displayResult(data);
-    } catch (error) {
-        console.error("상세 에러:", error);
-        labelContainer.innerHTML = `
-            <div style="color:#d93025; background:#fce8e6; padding:1.5rem; border-radius:10px; text-align:left;">
-                <p><strong>⚠️ 분석 실패</strong></p>
-                <pre style="font-size:0.8rem; white-space:pre-wrap; background:#fff; padding:10px; border-radius:5px; margin-top:10px;">${error.message}</pre>
-                <p style="font-size:0.8rem; margin-top:10px;">Cloudflare 설정에서 새로운 API 키가 GEMINI_API_KEY로 정확히 등록되었는지 확인해 주세요.</p>
-            </div>
-        `;
-    } finally {
-        loading.style.display = "none";
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+        labelContainer = document.getElementById("label-container");
+    } catch (e) {
+        console.error("모델 로드 실패. URL을 확인하세요.", e);
+        alert("모델을 불러오지 못했습니다. URL 설정을 확인해 주세요.");
     }
 }
 
-function resizeImage(file, maxWidth) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-            const img = new Image();
-            img.src = event.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                if (width > maxWidth) {
-                    height = (maxWidth / width) * height;
-                    width = maxWidth;
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.7));
-            };
-        };
-    });
-}
+async function predict() {
+    if (!model) return;
+    const image = document.getElementById("face-image");
+    const prediction = await model.predict(image);
+    
+    labelContainer.innerHTML = "";
+    for (let i = 0; i < maxPredictions; i++) {
+        let classPrediction = prediction[i].className;
+        
+        // 클래스명 한글 매핑 (강아지/고양이)
+        if (classPrediction.toLowerCase() === 'dog') classPrediction = '강아지상';
+        if (classPrediction.toLowerCase() === 'cat') classPrediction = '고양이상';
 
-function displayResult(data) {
-    const labelContainer = document.getElementById("label-container");
-    labelContainer.innerHTML = `
-        <div class="result-card">
-            <h2 class="result-animal">당신은 [${data.animal}]상입니다!</h2>
-            <div class="result-description">
-                <p>${data.description}</p>
+        const probability = (prediction[i].probability * 100).toFixed(0);
+        
+        const resultDiv = document.createElement("div");
+        resultDiv.className = "result-bar";
+        resultDiv.innerHTML = `
+            <span class="result-label">${classPrediction}</span>
+            <div class="bar-container">
+                <div class="bar" style="width: ${probability}%"></div>
             </div>
-            <div class="result-details">
-                <h3>🔍 상세 분석 리포트</h3>
-                <ul>
-                    ${data.details.map(detail => `<li>${detail}</li>`).join('')}
-                </ul>
-            </div>
-            <button onclick="location.reload()" style="margin-top:2rem; padding:0.8rem 2rem; border-radius:50px; border:1px solid #ddd; background:white; cursor:pointer;">다시 테스트하기</button>
-        </div>
-    `;
+            <span class="percent">${probability}%</span>
+        `;
+        labelContainer.appendChild(resultDiv);
+    }
+    document.getElementById("loading").style.display = "none";
 }
 
 function readURL(input) {
@@ -92,8 +68,66 @@ function readURL(input) {
             const img = document.getElementById("face-image");
             img.src = e.target.result;
             img.style.display = "block";
-            predict();
+            document.getElementById("loading").style.display = "block";
+            if (!model) {
+                init().then(() => predict());
+            } else {
+                predict();
+            }
         };
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+// 로또 기능
+const generateBtn = document.getElementById('generate-btn');
+const gamesContainer = document.getElementById('games-container');
+
+function generateLottoGame() {
+    const numbers = new Set();
+    while (numbers.size < 6) {
+        const randomNumber = Math.floor(Math.random() * 45) + 1;
+        numbers.add(randomNumber);
+    }
+    return Array.from(numbers).sort((a, b) => a - b);
+}
+
+function displayGames() {
+    gamesContainer.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        const gameDiv = document.createElement('div');
+        gameDiv.classList.add('lotto-game');
+
+        const gameHeader = document.createElement('h2');
+        gameHeader.textContent = `게임 ${i}`;
+        gameDiv.appendChild(gameHeader);
+
+        const lottoNumbersContainer = document.createElement('div');
+        lottoNumbersContainer.classList.add('lotto-numbers');
+
+        const numbers = generateLottoGame();
+        numbers.forEach(number => {
+            const numberDiv = document.createElement('div');
+            numberDiv.classList.add('number');
+            numberDiv.textContent = number;
+            numberDiv.style.backgroundColor = getNumberColor(number);
+            lottoNumbersContainer.appendChild(numberDiv);
+        });
+
+        gameDiv.appendChild(lottoNumbersContainer);
+        gamesContainer.appendChild(gameDiv);
+    }
+}
+
+function getNumberColor(number) {
+    if (number <= 10) return '#f44336';
+    if (number <= 20) return '#ff9800';
+    if (number <= 30) return '#ffc107';
+    if (number <= 40) return '#4caf50';
+    return '#2196f3';
+}
+
+generateBtn.addEventListener('click', displayGames);
+
+// 초기 로드
+displayGames();
